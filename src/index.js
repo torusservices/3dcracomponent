@@ -1,17 +1,33 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import { Canvas } from "@react-three/fiber"
+import { useGLTF, Stage, OrbitControls, Edges } from "@react-three/drei"
+import "./index.css"
+import r2wc from "@r2wc/react-to-web-component"
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>
-);
+function Model() {
+  const { nodes } = useGLTF("/headless.glb")
+  return (
+    <group dispose={null}>
+      <mesh geometry={nodes.Cube.geometry}>
+        <meshStandardMaterial transparent />
+        <Edges />
+      </mesh>
+    </group>
+  )
+}
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+function MyCanvas() {
+  return (
+    <Canvas dpr={[1, 2]} camera={{ position: [0, 0, 3], fov: 50 }}>
+      <Stage contactShadow={{ resolution: 1024, scale: 10 }}>
+        <Model />
+      </Stage>
+      <OrbitControls makeDefault dampingFactor={0.3} />
+    </Canvas>
+  )
+}
+
+const HelloWC = r2wc(MyCanvas, {
+  props: { name: "string" }
+})
+
+customElements.define("hello-wc", HelloWC)
